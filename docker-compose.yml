@@ -1,0 +1,9 @@
+services:
+  dev:
+    build: .
+    env_file: .env
+    volumes:
+      - .:/scaip-gateway
+    command: poetry run server-dev
+    ports:
+      - "8000:8000"
