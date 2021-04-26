@@ -1,7 +1,15 @@
 # SCAIP Gateway
 
-A simple HTTP to SCAIP over SIP gateway.
+A experimental HTTP to SCAIP over SIP gateway.
+Not intended for production use!
 
+## Configuration
+
+1. create `config.json` (see [config.py](scaip_gateway/config.py) for structure)
+2. create `.env` file with `SCAIP_GATEWAY_CONFIG` pointing to `config.json`
+
+
+## Development
 
 1. run `docker-compose up` to start the service
 2. open http://0.0.0.0:8000/docs

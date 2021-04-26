@@ -2,7 +2,8 @@
 name = "scaip-gateway"
 version = "0.1.0"
 description = ""
-authors = ["Linus Basig <linus@basig.me>"]
+authors = ["CARU AG <technology@caruhome.com>"]
+license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
 python = "^3.7"
