@@ -25,6 +25,7 @@ elif config_path.scheme == "ssm":
     client = boto3.client('ssm')
     config_raw = client.get_parameter(Name=config_path.path)
     config_raw = config_raw["Parameter"]["Value"]
+    config_raw = json.loads(config_raw)
 
 config = factory.load(config_raw, Configuration)
 
