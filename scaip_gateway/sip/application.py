@@ -68,9 +68,6 @@ class Application(SIPApplication):
     def _NH_SIPApplicationDidStart(self, notification):
         logger.info("SIPApplicationDidStart")
 
-        if self.config.sip.register:
-            self.register()
-
     def _NH_SIPMessageDidSucceed(self, notification):
         logger.info("SIPMessageDidSucceed")
 
@@ -96,13 +93,6 @@ class Application(SIPApplication):
 
         if result:
             result.set_result(scaip_response)
-
-    def register(self):
-        sip_config = self.config.sip
-        credentials = Credentials(sip_config.username.encode("utf-8"), sip_config.password.encode("utf-8"))
-        sender = self.get_sender()
-        registration = Registration(sender, credentials=credentials)
-        registration.register(ContactHeader(self.get_source_uri()), RouteHeader(self.get_source_uri()))
 
     def get_sender(self):
         return FromHeader(self.get_source_uri())

@@ -8,7 +8,6 @@ class SipConfiguration:
     port: str
     username: str
     password: Optional[str] = None
-    register: bool = False
 
 @dataclass(frozen=True, eq=True)
 class AlarmReceivingCenter:
