@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scaip-gateway"
-version = "0.2.3"
+version = "0.2.4"
 description = ""
 authors = ["CARU AG <technology@caruhome.com>"]
 license = "GPL-3.0-only"
@@ -28,6 +28,7 @@ twisted = "*"
 "zope.interface" = "*"
 requests = "*"
 gevent = "*"
+ursine = "^0.3.1"
 
 [tool.poetry.dev-dependencies]
 

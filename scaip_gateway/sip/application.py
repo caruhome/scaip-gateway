@@ -14,6 +14,7 @@ import asyncio
 from asyncio import Future
 from weakref import WeakValueDictionary
 from fastapi import HTTPException
+from ursine import URI
 
 logger = logging.getLogger()
 
@@ -47,10 +48,15 @@ class Application(SIPApplication):
         xml_str = self.serializer.render(xml_model)
 
         result = self.new_result_future(scaip_request.reference)
-        sender = self.get_sender()
+        caller_id = URI(scaip_request.caller_id)
+        if caller_id.scheme == "sip":
+            sender = SIPURI(user=caller_id.user, host=caller_id.host, port=caller_id.port)
+        else:
+            sender = self.get_user_agent_uri()
+
         receiver = SIPURI(user=arc_config.username, host=arc_config.hostname, port=arc_config.port)
         message = Message(
-            sender,
+            FromHeader(sender),
             ToHeader(receiver),
             RouteHeader(receiver),
             'application/scaip+xml',
@@ -64,6 +70,16 @@ class Application(SIPApplication):
         logger.info(f"received response: {scaip_response}")
 
         return scaip_response
+
+    def new_result_future(self, reference: str) -> Future:
+        loop = asyncio.get_running_loop()
+        result = loop.create_future()
+        self.requests[reference] = result
+        return result
+
+    def get_user_agent_uri(self) -> SIPURI:
+        sip_config = self.config.sip
+        return SIPURI(user=sip_config.username, host=sip_config.hostname, port=sip_config.port)
 
     def _NH_SIPApplicationDidStart(self, notification):
         logger.info("SIPApplicationDidStart")
@@ -93,17 +109,4 @@ class Application(SIPApplication):
 
         if result:
             result.set_result(scaip_response)
-
-    def get_sender(self):
-        return FromHeader(self.get_source_uri())
-
-    def new_result_future(self, reference: str) -> Future:
-        loop = asyncio.get_running_loop()
-        result = loop.create_future()
-        self.requests[reference] = result
-        return result
-
-    def get_source_uri(self) -> SIPURI:
-        sip_config = self.config.sip
-        return SIPURI(user=sip_config.username, host=sip_config.hostname, port=sip_config.port)
 
