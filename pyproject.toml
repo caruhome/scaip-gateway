@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scaip-gateway"
-version = "0.2.1"
+version = "0.2.3"
 description = ""
 authors = ["CARU AG <technology@caruhome.com>"]
 license = "GPL-3.0-only"
@@ -11,19 +11,23 @@ python3-application = {url = "http://download.ag-projects.com/SipSimpleSDK/Pytho
 python3-eventlib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-eventlib-0.3.0.tar.gz"}
 python3-gnutls = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-gnutls-3.1.7.tar.gz"}
 python3-otr = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-otr-3.0.0.tar.gz"}
-python3-msrplib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-msrplib-0.21.0.tar.gz"}
+python3-msrplib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-msrplib-0.21.1.tar.gz"}
 python3-xcaplib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-xcaplib-2.0.0.tar.gz"}
-Cython = "^0.29.22"
-python3-sipsimple = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-sipsimple-4.0.0.tar.gz"}
-greenlet = "^1.0.0"
-dnspython = "^2.1.0"
-lxml = "^4.6.3"
-python-dateutil = "^2.8.1"
-fastapi = "^0.63.0"
-uvicorn = "^0.13.4"
-xsdata = {extras = ["cli"], version = "^21.4"}
-dataclass-factory = "2.10.2"
-boto3 = "^1.17.73"
+Cython = "*"
+python3-sipsimple = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-sipsimple-5.2.2.tar.gz"}
+greenlet = "*"
+dnspython = "*"
+lxml = "*"
+python-dateutil = "*"
+fastapi = "*"
+uvicorn = "*"
+xsdata = {extras = ["cli"], version = "*"}
+dataclass-factory = "*"
+boto3 = "*"
+twisted = "*"
+"zope.interface" = "*"
+requests = "*"
+gevent = "*"
 
 [tool.poetry.dev-dependencies]
 

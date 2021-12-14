@@ -391,7 +391,7 @@ class CallhandlingReply(str, Enum):
 
 class ScaipResponse(BaseModel):
     reference: str = Field(scaip='ref')
-    status_number: StatusNumber = Field(scaip='snu')
+    status_number: Union[StatusNumber, int] = Field(scaip='snu')
     status_text: str = Field(default='', scaip='ste')
     common_version: Optional[str] = Field(default=None, scaip='cve')
     media_reply: MediaReply =  Field(default=MediaReply.NO_VOICE_CALL, scaip='mre')
