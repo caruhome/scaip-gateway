@@ -48,8 +48,8 @@ class Application(SIPApplication):
         xml_str = self.serializer.render(xml_model)
 
         result = self.new_result_future(scaip_request.reference)
-        caller_id = URI(scaip_request.caller_id)
-        if caller_id.scheme == "sip":
+        if scaip_request.caller_id.startswith("sip") and scaip_request.caller_id != "sip:":
+            caller_id = URI(scaip_request.caller_id)
             sender = SIPURI(user=caller_id.user, host=caller_id.host, port=caller_id.port)
         else:
             sender = self.get_user_agent_uri()
