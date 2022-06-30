@@ -52,7 +52,7 @@ class Application(SIPApplication):
             caller_id = URI(scaip_request.caller_id)
             sender = SIPURI(user=caller_id.user, host=caller_id.host, port=caller_id.port)
         else:
-            sender = self.get_user_agent_uri()
+            sender = SIPURI(user=scaip_request.controller_id, host=arc_config.hostname, port=arc_config.port)
 
         receiver = SIPURI(user=arc_config.username, host=arc_config.hostname, port=arc_config.port)
         message = Message(
@@ -76,10 +76,6 @@ class Application(SIPApplication):
         result = loop.create_future()
         self.requests[reference] = result
         return result
-
-    def get_user_agent_uri(self) -> SIPURI:
-        sip_config = self.config.sip
-        return SIPURI(user=sip_config.username, host=sip_config.hostname, port=sip_config.port)
 
     def _NH_SIPApplicationDidStart(self, notification):
         logger.info("SIPApplicationDidStart")
