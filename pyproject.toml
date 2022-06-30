@@ -7,7 +7,7 @@ license = "GPL-3.0-only"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-python3-application = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-application-3.0.2.tar.gz"}
+python3-application = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-application-3.0.3.tar.gz"}
 python3-eventlib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-eventlib-0.3.0.tar.gz"}
 python3-gnutls = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-gnutls-3.1.7.tar.gz"}
 python3-otr = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-otr-3.0.0.tar.gz"}

@@ -26,4 +26,4 @@ WORKDIR /scaip-gateway
 COPY . .
 RUN poetry install
 
-CMD [ "/bin/bash" ]
+CMD [ "bin", "bash" ]
