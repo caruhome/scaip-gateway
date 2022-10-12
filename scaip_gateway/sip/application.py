@@ -55,12 +55,22 @@ class Application(SIPApplication):
             sender = SIPURI(user=scaip_request.controller_id, host=arc_config.hostname, port=arc_config.port)
 
         receiver = SIPURI(user=arc_config.username, host=arc_config.hostname, port=arc_config.port)
+
+        if arc_config.username and arc_config.password:
+            credentials = Credentials(
+                username=arc_config.username,
+                password=arc_config.password,
+            )
+        else:
+            credentials = None
+
         message = Message(
-            FromHeader(sender),
-            ToHeader(receiver),
-            RouteHeader(receiver),
-            'application/scaip+xml',
-            xml_str
+            from_header=FromHeader(sender),
+            to_header=ToHeader(receiver),
+            route_header=RouteHeader(receiver),
+            content_type='application/scaip+xml',
+            body=xml_str,
+            credentials=credentials,
         )
         message.send()
         logger.info(f"sent message: {xml_str}")
