@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "scaip-gateway"
-version = "0.2.6"
+version = "0.2.7"
 description = ""
 authors = ["CARU AG <technology@caruhome.com>"]
 license = "GPL-3.0-only"
