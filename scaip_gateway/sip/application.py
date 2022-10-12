@@ -96,14 +96,17 @@ class Application(SIPApplication):
         logger.info("SIPMessageDidSucceed")
 
     def _NH_SIPMessageDidFail(self, notification):
-        logger.error("SIPMessageDidFail", notification.data.reason)
+        reason = notification.data.reason.decode("utf-8")
+        logger.error(
+            f"SIPMessageDidFail: {reason} ({notification.data.code})",
+        )
 
         message = notification.sender
         xml_model = self.parser.from_bytes(message.body, Mrq)
         result = self.requests.get(xml_model.ref, None)
 
         if result:
-            result.set_exception(HTTPException(status_code=500, detail=notification.data.reason))
+            result.set_exception(HTTPException(status_code=500, detail=reason))
 
     def _NH_SIPEngineGotMessage(self, notification):
         logger.info("SIPEngineGotMessage")
