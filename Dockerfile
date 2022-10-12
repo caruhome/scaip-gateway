@@ -24,6 +24,7 @@ ENV PATH /root/.poetry/bin:$PATH
 WORKDIR /scaip-gateway
 
 COPY . .
+RUN pip install --upgrade pip
 RUN poetry install
 
 CMD [ "bin", "bash" ]
