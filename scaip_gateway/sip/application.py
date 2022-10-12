@@ -56,13 +56,15 @@ class Application(SIPApplication):
 
         receiver = SIPURI(user=arc_config.username, host=arc_config.hostname, port=arc_config.port)
 
-        if arc_config.username and arc_config.password:
+        if arc_config.credentials:
             credentials = Credentials(
-                username=arc_config.username,
-                password=arc_config.password,
+                username=arc_config.credentials.username,
+                password=arc_config.credentials.password,
             )
         else:
             credentials = None
+
+        logger.info(f"credentials: {credentials}")
 
         message = Message(
             from_header=FromHeader(sender),

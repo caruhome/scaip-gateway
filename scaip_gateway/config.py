@@ -10,12 +10,17 @@ class SipConfiguration:
     password: Optional[str] = None
 
 @dataclass(frozen=True, eq=True)
+class AlarmReceivingCenterCredentials:
+    username: str
+    password: str
+
+@dataclass(frozen=True, eq=True)
 class AlarmReceivingCenter:
     name: str
     hostname: str
     port: str
     username: str
-    password: str
+    credentials: Optional[AlarmReceivingCenterCredentials] = None
 
 @dataclass(frozen=True, eq=True)
 class Configuration:
