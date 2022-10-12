@@ -74,7 +74,7 @@ class Application(SIPApplication):
             body=xml_str,
             credentials=credentials,
         )
-        message.send()
+        message.send(timeout=20)
         logger.info(f"sent message: {xml_str}")
 
         scaip_response = await result
