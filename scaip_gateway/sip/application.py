@@ -1,7 +1,9 @@
 from sipsimple.application import SIPApplication
 from sipsimple.storage import MemoryStorage
 from application.notification import NotificationCenter
-from sipsimple.core import FromHeader, Message, RouteHeader, SIPURI, ToHeader, Registration, Credentials, ContactHeader
+from sipsimple.core import FromHeader, Message, RouteHeader, SIPURI, ToHeader, Registration, Credentials, ContactHeader, Engine, Route
+from sipsimple.configuration import ConfigurationManager
+from sipsimple.account import Account, AccountManager
 from scaip_gateway.spec import ScaipRequest, ScaipResponse
 from scaip_gateway.xml import Mrs, Mrq
 from scaip_gateway.config import Configuration
@@ -21,7 +23,6 @@ logger = logging.getLogger()
 class Application(SIPApplication):
     def __init__(self, *, config: Configuration) -> None:
         self.config = config
-
         self.serializer = XmlSerializer(config=SerializerConfig(pretty_print=False))
         self.parser = XmlParser(context=XmlContext())
         self.requests: WeakValueDictionary[str, Future] = WeakValueDictionary({})
@@ -48,34 +49,34 @@ class Application(SIPApplication):
 
         xml_model = scaip_request.to_xml_model()
         xml_str = self.serializer.render(xml_model)
-
         result = self.new_result_future(scaip_request.reference)
-        if scaip_request.caller_id.startswith("sip") and scaip_request.caller_id != "sip:":
-            caller_id = URI(scaip_request.caller_id)
-            sender = SIPURI(user=caller_id.user, host=caller_id.host, port=caller_id.port)
-        else:
-            sender = SIPURI(user=scaip_request.controller_id, host=arc_config.hostname, port=arc_config.port)
 
-        receiver = SIPURI(user=arc_config.username, host=arc_config.hostname, port=arc_config.port)
-
-        if arc_config.credentials:
-            credentials = Credentials(
-                username=arc_config.credentials.username,
-                password=arc_config.credentials.password,
-            )
+        if arc_config.user:
+            account = AccountManager().get_account(f"{arc_config.user.username}@{arc_config.hostname}")
+            from_uri = account.uri
+            credentials = account.credentials
         else:
             credentials = None
+            if scaip_request.caller_id.startswith("sip") and scaip_request.caller_id not in ["sip:", "sips:"]:
+                from_uri = SIPURI.parse(scaip_request.caller_id)
+            else:
+                from_uri = SIPURI(arc_config.hostname, user=scaip_request.controller_id)
 
-        logger.info(f"credentials: {credentials}")
+        to_uri = SIPURI(arc_config.hostname, user=arc_config.username, port=arc_config.port)
+        arc_route = Route(arc_config.hostname, port=arc_config.port, transport=arc_config.transport.value)
 
         message = Message(
-            from_header=FromHeader(sender),
-            to_header=ToHeader(receiver),
-            route_header=RouteHeader(receiver),
+            from_header=FromHeader(from_uri),
+            to_header=ToHeader(to_uri),
+            route_header=RouteHeader(arc_route.uri),
             content_type='application/scaip+xml',
             body=xml_str,
             credentials=credentials,
         )
+        logger.info(f"message.from_header: {message.from_header}")
+        logger.info(f"message.to_header: {message.to_header}")
+        logger.info(f"message.route_header: {message.route_header}")
+        logger.info(f"message.credentials: {message.credentials}")
         message.send(timeout=20)
         logger.info(f"sent message: {xml_str}")
 
@@ -97,6 +98,21 @@ class Application(SIPApplication):
         engine = Engine()
         engine.log_level = 5
         engine.trace_sip = True
+
+        for arc_config in self.config.arcs:
+            if arc_config.user:
+                account = Account(f"{arc_config.user.username}@{arc_config.hostname}")
+                logger.info(f"add Account for {arc_config.name} ({account.id})")
+                account.display_name = arc_config.name
+                account.enabled = True
+                account.sip.register = False
+                account.presence.enabled = False
+                account.message_summary.enabled = False
+                account.xcap.enabled = False
+                account.auth.username = arc_config.user.username
+                account.auth.password = arc_config.user.password
+                account.save()
+
     def _NH_SIPMessageDidSucceed(self, notification):
         logger.info("SIPMessageDidSucceed")
 
@@ -107,6 +123,8 @@ class Application(SIPApplication):
         logger.error(
             f"SIPMessageDidFail: {reason} ({notification.data.code})",
         )
+        if notification.data.code == 202:
+            return
 
         message = notification.sender
         xml_model = self.parser.from_bytes(message.body, Mrq)
@@ -128,8 +146,7 @@ class Application(SIPApplication):
 
     def _NH_SIPEngineLog(self, notification):
         logger.info(
-            #level=notification.data.level,
-            msg=f"[{getattr(notification.data, 'sender', 'unknown')}]: {notification.data.message}"
+            f"[{getattr(notification.data, 'sender', 'unknown')}]: {notification.data.message}"
         )
 
     def _NH_SIPEngineSIPTrace(self, notification):

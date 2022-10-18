@@ -1,30 +1,33 @@
 from dataclasses import dataclass
 from typing import Optional, FrozenSet
 from functools import lru_cache
+from enum import Enum
+
+
+class Transport(Enum):
+    UDP = "udp"
+    TCP = "tcp"
+    TLS = "tls"
+
 
 @dataclass(frozen=True, eq=True)
-class SipConfiguration:
-    hostname: str
-    port: str
-    username: str
-    password: Optional[str] = None
-
-@dataclass(frozen=True, eq=True)
-class AlarmReceivingCenterCredentials:
+class AlarmReceivingCenterUser:
     username: str
     password: str
+
 
 @dataclass(frozen=True, eq=True)
 class AlarmReceivingCenter:
     name: str
     hostname: str
-    port: str
-    username: str
-    credentials: Optional[AlarmReceivingCenterCredentials] = None
+    port: int
+    username: Optional[str] = None
+    transport: Transport = Transport.UDP
+    user: Optional[AlarmReceivingCenterUser] = None
+
 
 @dataclass(frozen=True, eq=True)
 class Configuration:
-    sip: SipConfiguration
     arcs: FrozenSet[AlarmReceivingCenter]
 
     def __post_init__(self):
