@@ -3,7 +3,7 @@ import json
 
 import boto3
 
-from scaip_gateway.config import AlarmReceivingCenter, Configuration, SipConfiguration
+from scaip_gateway.config import AlarmReceivingCenter, Configuration
 from fastapi import FastAPI
 from scaip_gateway.spec import ScaipRequest, ScaipResponse
 from scaip_gateway.sip.application import Application
