@@ -33,6 +33,8 @@ class Application(SIPApplication):
         notification_center.add_observer(self, name='SIPMessageDidSucceed')
         notification_center.add_observer(self, name='SIPMessageDidFail')
         notification_center.add_observer(self, name='SIPApplicationDidStart')
+        notification_center.add_observer(self, name='SIPEngineLog')
+        notification_center.add_observer(self, name='SIPEngineSIPTrace')
         super().start(MemoryStorage())
 
     async def send_request(self, arc_name: str, scaip_request: ScaipRequest):
@@ -92,11 +94,16 @@ class Application(SIPApplication):
     def _NH_SIPApplicationDidStart(self, notification):
         logger.info("SIPApplicationDidStart")
 
+        engine = Engine()
+        engine.log_level = 5
+        engine.trace_sip = True
     def _NH_SIPMessageDidSucceed(self, notification):
         logger.info("SIPMessageDidSucceed")
 
     def _NH_SIPMessageDidFail(self, notification):
-        reason = notification.data.reason.decode("utf-8")
+        reason = notification.data.reason
+        if isinstance(reason, bytes):
+            reason = reason.decode("utf-8")
         logger.error(
             f"SIPMessageDidFail: {reason} ({notification.data.code})",
         )
@@ -106,7 +113,7 @@ class Application(SIPApplication):
         result = self.requests.get(xml_model.ref, None)
 
         if result:
-            result.set_exception(HTTPException(status_code=500, detail=reason))
+            result.set_exception(HTTPException(status_code=notification.data.code, detail=reason))
 
     def _NH_SIPEngineGotMessage(self, notification):
         logger.info("SIPEngineGotMessage")
@@ -118,4 +125,13 @@ class Application(SIPApplication):
 
         if result:
             result.set_result(scaip_response)
+
+    def _NH_SIPEngineLog(self, notification):
+        logger.info(
+            #level=notification.data.level,
+            msg=f"[{getattr(notification.data, 'sender', 'unknown')}]: {notification.data.message}"
+        )
+
+    def _NH_SIPEngineSIPTrace(self, notification):
+        logger.info(f"SIPEngineSIPTrace: {notification.data.__dict__}")
 
