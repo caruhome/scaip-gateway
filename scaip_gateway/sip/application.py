@@ -13,6 +13,7 @@ from xsdata.formats.dataclass.context import XmlContext
 from xsdata.formats.dataclass.parsers import XmlParser
 import logging
 import asyncio
+import socket
 from asyncio import Future
 from weakref import WeakValueDictionary
 from fastapi import HTTPException
@@ -43,6 +44,7 @@ class Application(SIPApplication):
 
         config = self.config
         arc_config = config.get_arc_config(arc_name)
+        arc_host = socket.gethostbyname(arc_config.hostname)
 
         if not arc_config:
             raise ValueError(f"no configuration found for ARC {arc_name}")
@@ -52,7 +54,7 @@ class Application(SIPApplication):
         result = self.new_result_future(scaip_request.reference)
 
         if arc_config.user:
-            account = AccountManager().get_account(f"{arc_config.user.username}@{arc_config.hostname}")
+            account = AccountManager().get_account(f"{arc_config.user.username}@{arc_host}")
             from_uri = account.uri
             credentials = account.credentials
         else:
@@ -60,11 +62,15 @@ class Application(SIPApplication):
             if scaip_request.caller_id.startswith("sip") and scaip_request.caller_id not in ["sip:", "sips:"]:
                 from_uri = SIPURI.parse(scaip_request.caller_id)
             else:
-                from_uri = SIPURI(arc_config.hostname, user=scaip_request.controller_id)
+                from_uri = SIPURI(arc_host, user=scaip_request.controller_id)
 
-        to_uri = SIPURI(arc_config.hostname, user=arc_config.username, port=arc_config.port)
-        arc_route = Route(arc_config.hostname, port=arc_config.port, transport=arc_config.transport.value)
+        to_uri = SIPURI(host=arc_host, user=arc_config.username, port=arc_config.port)
+        arc_route = Route(arc_host, port=arc_config.port, transport=arc_config.transport.value)
 
+        logger.info(f"message.from_header: {message.from_header}")
+        logger.info(f"message.to_header: {message.to_header}")
+        logger.info(f"message.route_header: {message.route_header}")
+        logger.info(f"message.credentials: {message.credentials}")
         message = Message(
             from_header=FromHeader(from_uri),
             to_header=ToHeader(to_uri),
@@ -73,10 +79,6 @@ class Application(SIPApplication):
             body=xml_str,
             credentials=credentials,
         )
-        logger.info(f"message.from_header: {message.from_header}")
-        logger.info(f"message.to_header: {message.to_header}")
-        logger.info(f"message.route_header: {message.route_header}")
-        logger.info(f"message.credentials: {message.credentials}")
         message.send(timeout=20)
         logger.info(f"sent message: {xml_str}")
 
