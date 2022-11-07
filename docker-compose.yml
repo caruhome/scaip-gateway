@@ -4,6 +4,7 @@ services:
     env_file: .env
     volumes:
       - .:/scaip-gateway
-    command: poetry run server-dev
+    command: server-dev
     ports:
       - "8000:8000"
+    platform: linux/amd64

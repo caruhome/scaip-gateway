@@ -13,7 +13,6 @@ python3-gnutls = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/py
 python3-otr = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-otr-3.0.0.tar.gz"}
 python3-msrplib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-msrplib-0.21.1.tar.gz"}
 python3-xcaplib = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-xcaplib-2.0.0.tar.gz"}
-Cython = "*"
 python3-sipsimple = {url = "http://download.ag-projects.com/SipSimpleSDK/Python3/python3-sipsimple-5.2.2.tar.gz"}
 greenlet = "*"
 dnspython = "*"
@@ -33,8 +32,8 @@ ursine = "^0.3.1"
 [tool.poetry.dev-dependencies]
 
 [tool.poetry.scripts]
-server-dev = "scripts:server_dev"
+server-dev = "scaip_gateway.scripts:server_dev"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core>=1.0.0", "Cython"]
 build-backend = "poetry.core.masonry.api"
