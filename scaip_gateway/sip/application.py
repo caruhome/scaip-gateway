@@ -66,11 +66,6 @@ class Application(SIPApplication):
 
         to_uri = SIPURI(host=arc_host, user=arc_config.username, port=arc_config.port)
         arc_route = Route(arc_host, port=arc_config.port, transport=arc_config.transport.value)
-
-        logger.info(f"message.from_header: {message.from_header}")
-        logger.info(f"message.to_header: {message.to_header}")
-        logger.info(f"message.route_header: {message.route_header}")
-        logger.info(f"message.credentials: {message.credentials}")
         message = Message(
             from_header=FromHeader(from_uri),
             to_header=ToHeader(to_uri),
@@ -79,6 +74,10 @@ class Application(SIPApplication):
             body=xml_str,
             credentials=credentials,
         )
+        logger.info(f"message.from_header: {message.from_header}")
+        logger.info(f"message.to_header: {message.to_header}")
+        logger.info(f"message.route_header: {message.route_header}")
+        logger.info(f"message.credentials: {message.credentials}")
         message.send(timeout=20)
         logger.info(f"sent message: {xml_str}")
 
