@@ -301,7 +301,7 @@ class InfoCode(str, Enum):
 
 def to_xml_model(api_model, xml_class):
     api_dict = api_model.dict(
-        exclude_defaults=False,
+        exclude_defaults=True,
         exclude_none=True,
         )
     xml_dict = {}
