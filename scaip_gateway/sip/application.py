@@ -54,7 +54,7 @@ class Application(SIPApplication):
         result = self.new_result_future(scaip_request.reference)
 
         if arc_config.user:
-            account = AccountManager().get_account(f"{arc_config.user.username}@{arc_host}")
+            account = AccountManager().get_account(f"{arc_config.user.username}@{arc_config.hostname}")
             from_uri = account.uri
             credentials = account.credentials
         else:
