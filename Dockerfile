@@ -1,23 +1,10 @@
-FROM python:3.7-stretch
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    libssl-dev \
-    libgmp3-dev \
-    libmpfr-dev \
-    libmpc-dev \
-    libswscale-dev \
-    libvpx-dev \
-    libasound2-dev \
-    libavcodec-dev \
-    libavdevice-dev \
-    libavfilter-dev \
-    libavformat-dev \
-    libavresample-dev \
-    libavutil-dev \
-    libpostproc-dev \
-    libswresample-dev \
-    libswscale-dev \
-    libpjproject-dev
+FROM python:3.7-buster
+RUN wget -O /etc/apt/trusted.gpg.d/agp-debian-key.gpg http://download.ag-projects.com/agp-debian-key.gpg
+RUN echo 'deb http://ag-projects.com/debian buster main' >> /etc/apt/sources.list
+RUN echo 'deb-src http://ag-projects.com/debian buster main' >> /etc/apt/sources.list
+RUN cat /etc/apt/sources.list
+RUN apt-get update && apt-get install -y python3-sipsimple
+ENV PYTHONPATH /usr/lib/python3/dist-packages/
 
 WORKDIR /scaip-gateway
 
